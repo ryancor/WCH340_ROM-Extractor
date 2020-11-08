@@ -1255,6 +1255,7 @@ class ch340_processor_t(idaapi.processor_t):
 			0x2E: idef_I_type_condjump("bgeu", "branch if greater than or equal unsigned"),
 			0x2F: idef_I_type_load("ldhio", "load halfword from I/O peripheral", dt_word),
 			0x30: idef_I_type("cmpltui", "compare less than unsigned immediate"),
+			0x31: idef_I_type("call_110", "calls address"),
 			0x32: idef_custom("custom", "custom instruction"),
 			0x33: idef_I_type_cache("initd", "initialize data cache line"),
 			0x34: idef_I_type("orhi", "bitwise logical or immediate into high halfword"),

@@ -414,8 +414,8 @@ class ch340_processor_t(idaapi.processor_t):
 
 	def out_mnem(self, ctx):
 		postfix = ""
-		if ctx.insn.itype == self.itype_custom:
-			postfix = " " + str(ctx.insn.Op1.specval)
+		# if ctx.insn.itype == self.itype_custom:
+		# 	postfix = " " + str(ctx.insn.Op1.specval)
 		ctx.out_mnem(12, postfix)
 
 	def notify_out_insn(self, ctx):
@@ -727,7 +727,7 @@ class ch340_processor_t(idaapi.processor_t):
 			self.handle_operand(insn, insn.Op4, 0)
 		if Feature & CF_JUMP:
 			remember_problem(PR_JUMP, insn.ea)
-		IsUncondJmp = insn.itype in [self.itype_br, self.itype_jmp, self.itype_jmpi]
+		IsUncondJmp = insn.itype in [self.itype_jmpi]
 		IsFlow = (Feature & CF_STOP == 0) and not IsUncondJmp
 		if IsFlow:
 			add_cref(insn.ea, insn.ea + insn.size, fl_F)
@@ -828,17 +828,17 @@ class ch340_processor_t(idaapi.processor_t):
 			if insn.itype == self.itype_add:
 				insn.itype = self.itype_mov
 				insn.Op3.type = o_void
-		if insn.itype == self.itype_addi:
-			if insn.Op3.specflag1 & self.FL_SIGNED:
-				insn.itype = self.itype_subi
-				insn.Op3.value = 0xFFFF & (- insn.Op3.value)
-				insn.Op3.specflag1 &= ~self.FL_SIGNED
+		# if insn.itype == self.itype_addi:
+		# 	if insn.Op3.specflag1 & self.FL_SIGNED:
+		# 		insn.itype = self.itype_subi
+		# 		insn.Op3.value = 0xFFFF & (- insn.Op3.value)
+		# 		insn.Op3.specflag1 &= ~self.FL_SIGNED
 		#Check custom cmd
-		if insn.itype == self.itype_custom:
-			CmdNumber = insn.Op1.specval
-			if self.itable_custom.get(CmdNumber) != None:
-				CurInstruction = self.itable_custom[CmdNumber]
-				insn.itype = getattr(self, 'itype_' + CurInstruction.name)
+		# if insn.itype == self.itype_custom:
+		# 	CmdNumber = insn.Op1.specval
+		# 	if self.itable_custom.get(CmdNumber) != None:
+		# 		CurInstruction = self.itable_custom[CmdNumber]
+		# 		insn.itype = getattr(self, 'itype_' + CurInstruction.name)
 
 
 	# ----------------------------------------------------------------------
@@ -868,8 +868,8 @@ class ch340_processor_t(idaapi.processor_t):
 			c.type = o_void
 		CurInstruction.decode(insn, InstructionCode)
 		self.simplify(insn)
-		if insn.size != 0:
-			self.check_off32(insn)
+		# if insn.size != 0:
+		# 	self.check_off32(insn)
 		return insn.size
 
 
@@ -1219,52 +1219,52 @@ class ch340_processor_t(idaapi.processor_t):
 
 		# OP Encodings Table
 		self.itable_I_Type = {
-			0x00: idef_J_type("call", "call subroutine"),
-			0x01: idef_J_type("jmpi", "jump immediate", CF_USE1 | CF_JUMP | CF_STOP),
-			0x03: idef_I_type_load("ldbu", "load unsigned byte from memory", dt_byte),
-			0x04: idef_I_type_sign("addi", "add immediate"),
-			0x05: idef_I_type_store("stb", "store byte to memory", dt_byte),
-			0x06: idef_I_type_br("br", "unconditional branch"),
-			0x07: idef_I_type_load("ldb", "load byte from memory", dt_byte),
-			0x08: idef_I_type_sign("cmpgei", "compare greater than or equal signed immediate"),
-			0x0B: idef_I_type_load("ldhu", "load unsigned halfword from memory", dt_word),
-			0x0C: idef_I_type("andi", "bitwise logical and immediate"),
-			0x0D: idef_I_type_store("sth", "store halfword to memory", dt_word),
-			0x0E: idef_I_type_condjump("bge", "branch if greater than or equal signed"),
-			0x0F: idef_I_type_load("ldh", "load halfword from memory", dt_word),
-			0x10: idef_I_type_sign("cmplti", "compare less than signed immediate"),
-			0x13: idef_I_type_cache("initda", "initialize data cache address"),
-			0x14: idef_I_type("ori", "bitwise logical or immediate"),
-			0x15: idef_I_type_store("stw", "store word to memory", dt_dword),
-			0x16: idef_I_type_condjump("blt", "branch if less than signed"),
-			0x17: idef_I_type_load("ldw", "load 32-bit word from memory", dt_dword),
-			0x18: idef_I_type_sign("cmpnei", "compare not equal immediate"),
-			0x1b: idef_I_type_cache("flushda", "flush data cache address"),
-			0x1c: idef_I_type("xori", "bitwise logical exclusive or immediate"),
-			0x1e: idef_I_type_condjump("bne","branch if not equal"),
-			0x20: idef_I_type_sign("cmpeqi", "compare equal immediate"),
-			0x23: idef_I_type_load("ldbuio", "load unsigned byte from I/O peripheral", dt_byte),
-			0x24: idef_I_type_sign("muli", "multiply immediate"),
-			0x25: idef_I_type_store("stbio", "store byte to I/O peripheral", dt_byte),
-			0x26: idef_I_type_condjump("beq", "branch if equal"),
-			0x27: idef_I_type_load("ldbio", "load byte from I/O peripheral", dt_byte),
-			0x28: idef_I_type("cmpgeui", "compare greater than or equal unsigned immediate"),
-			0x2B: idef_I_type_load("ldhuio", "load unsigned halfword from I/O peripheral", dt_word),
-			0x2C: idef_I_type("andhi", "bitwise logical and immediate into high halfword"),
-			0x2D: idef_I_type_store("sthio", "store halfword to I/O peripheral", dt_word),
-			0x2E: idef_I_type_condjump("bgeu", "branch if greater than or equal unsigned"),
-			0x2F: idef_I_type_load("ldhio", "load halfword from I/O peripheral", dt_word),
-			0x30: idef_I_type("cmpltui", "compare less than unsigned immediate"),
-			0x31: idef_I_type("call_110", "calls address"),
-			0x32: idef_custom("custom", "custom instruction"),
-			0x33: idef_I_type_cache("initd", "initialize data cache line"),
-			0x34: idef_I_type("orhi", "bitwise logical or immediate into high halfword"),
-			0x35: idef_I_type_store("stwio", "store word to I/O peripheral", dt_dword),
-			0x36: idef_I_type_condjump("bltu", "branch if less than unsigned"),
-			0x37: idef_I_type_load("ldwio", "load 32-bit word from I/O peripheral", dt_dword),
-			0x38: idef_I_type_sign("rdprs", "read from previous register set"),
-			0x3b: idef_I_type_cache("flushd", "flush data cache line"),
-			0x3c: idef_I_type("xorhi", "bitwise logical exclusive or immediate into high halfword"),
+			#0x00: idef_J_type("call", "call subroutine"),
+			0x01: idef_J_type("jmpi", "jump immediate", dt_byte),
+			# 0x03: idef_I_type_load("ldbu", "load unsigned byte from memory", dt_byte),
+			# 0x04: idef_I_type_sign("addi", "add immediate"),
+			# 0x05: idef_I_type_store("stb", "store byte to memory", dt_byte),
+			# 0x06: idef_I_type_br("br", "unconditional branch"),
+			# 0x07: idef_I_type_load("ldb", "load byte from memory", dt_byte),
+			# 0x08: idef_I_type_sign("cmpgei", "compare greater than or equal signed immediate"),
+			# 0x0B: idef_I_type_load("ldhu", "load unsigned halfword from memory", dt_word),
+			# 0x0C: idef_I_type("andi", "bitwise logical and immediate"),
+			# 0x0D: idef_I_type_store("sth", "store halfword to memory", dt_word),
+			# 0x0E: idef_I_type_condjump("bge", "branch if greater than or equal signed"),
+			# 0x0F: idef_I_type_load("ldh", "load halfword from memory", dt_word),
+			0x10: idef_J_type("usb_tx", "sends byte through uart"),
+			# 0x13: idef_I_type_cache("initda", "initialize data cache address"),
+			# 0x14: idef_I_type("ori", "bitwise logical or immediate"),
+			# 0x15: idef_I_type_store("stw", "store word to memory", dt_dword),
+			# 0x16: idef_I_type_condjump("blt", "branch if less than signed"),
+			# 0x17: idef_I_type_load("ldw", "load 32-bit word from memory", dt_dword),
+			# 0x18: idef_I_type_sign("cmpnei", "compare not equal immediate"),
+			# 0x1b: idef_I_type_cache("flushda", "flush data cache address"),
+			# 0x1c: idef_I_type("xori", "bitwise logical exclusive or immediate"),
+			# 0x1e: idef_I_type_condjump("bne","branch if not equal"),
+			# 0x20: idef_I_type_sign("cmpeqi", "compare equal immediate"),
+			# 0x23: idef_I_type_load("ldbuio", "load unsigned byte from I/O peripheral", dt_byte),
+			# 0x24: idef_I_type_sign("muli", "multiply immediate"),
+			# 0x25: idef_I_type_store("stbio", "store byte to I/O peripheral", dt_byte),
+			# 0x26: idef_I_type_condjump("beq", "branch if equal"),
+			# 0x27: idef_I_type_load("ldbio", "load byte from I/O peripheral", dt_byte),
+			# 0x28: idef_I_type("cmpgeui", "compare greater than or equal unsigned immediate"),
+			# 0x2B: idef_I_type_load("ldhuio", "load unsigned halfword from I/O peripheral", dt_word),
+			# 0x2C: idef_I_type("andhi", "bitwise logical and immediate into high halfword"),
+			# 0x2D: idef_I_type_store("sthio", "store halfword to I/O peripheral", dt_word),
+			# 0x2E: idef_I_type_condjump("bgeu", "branch if greater than or equal unsigned"),
+			# 0x2F: idef_I_type_load("ldhio", "load halfword from I/O peripheral", dt_word),
+			# 0x30: idef_I_type("cmpltui", "compare less than unsigned immediate"),
+			0x31: idef_J_type("call_110", "calls address"),
+			# 0x32: idef_custom("custom", "custom instruction"),
+			# 0x33: idef_I_type_cache("initd", "initialize data cache line"),
+			# 0x34: idef_I_type("orhi", "bitwise logical or immediate into high halfword"),
+			# 0x35: idef_I_type_store("stwio", "store word to I/O peripheral", dt_dword),
+			# 0x36: idef_I_type_condjump("bltu", "branch if less than unsigned"),
+			# 0x37: idef_I_type_load("ldwio", "load 32-bit word from I/O peripheral", dt_dword),
+			# 0x38: idef_I_type_sign("rdprs", "read from previous register set"),
+			# 0x3b: idef_I_type_cache("flushd", "flush data cache line"),
+			# 0x3c: idef_I_type("xorhi", "bitwise logical exclusive or immediate into high halfword"),
 			}
 
 		# OPX Encodings Table
@@ -1379,8 +1379,8 @@ class ch340_processor_t(idaapi.processor_t):
 		# register names
 		self.reg_names = [
 			# General-Purpose Registers
-			"zero",		#aka r0
-			"at",		#aka r1
+			"r0",		#aka r0
+			"r1",		#aka r1
 			"r2",
 			"r3",
 			"r4",

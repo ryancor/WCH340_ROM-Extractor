@@ -75,7 +75,7 @@ class ch340_processor_t(idaapi.processor_t):
 
     # long processor names
     # No restriction on name lengthes.
-    plnames = ['W.CH340G Unknown Firmware']
+    plnames = ['W.CH340 (little endian)']
 
     # size of a segment register in bytes
     segreg_size = 0
@@ -106,7 +106,7 @@ class ch340_processor_t(idaapi.processor_t):
         'uflag': 0,
 
         # Assembler name (displayed in menus)
-        'name': "W.CH340G Unknown Firmware",
+        'name': "W.CH340 (little endian)",
 
         # array of automatically generated header lines they appear at the start of disassembled text (optional)
         'header': [".CH340"],
@@ -503,7 +503,7 @@ class ch340_processor_t(idaapi.processor_t):
             i += 1
 
         # icode of the last instruction + 1
-        self.instruc_end = len(Instructions) + 1
+        self.instruc_end = len(Instructions)
 
         # Array of instructions
         self.instruc = Instructions

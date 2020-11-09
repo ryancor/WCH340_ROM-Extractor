@@ -357,8 +357,6 @@ class ch340_processor_t(idaapi.processor_t):
 
     def out_mnem(self, ctx):
         postfix = ""
-        # if ctx.insn.itype == self.itype_custom:
-        #   postfix = " " + str(ctx.insn.Op1.specval)
         ctx.out_mnem(12, postfix)
 
     def notify_out_insn(self, ctx):
@@ -460,9 +458,9 @@ class ch340_processor_t(idaapi.processor_t):
             insn.itype = self.itype_call_111
             insn.Op1.addr = BITS(InstructionCode, 10, 0)
             insn.Op1.type = o_near
-        elif BITS(InstructionCode, 13, 8) == 0x10:
+        elif BITS(InstructionCode, 7, 0) == 0x10:
             insn.itype = self.itype_usbtx
-            insn.Op1.value = BITS(InstructionCode, 7, 0)
+            insn.Op1.value = BITS(InstructionCode, 13, 8)
             insn.Op1.type = o_imm
         elif BITS(InstructionCode, 13, 0) == 0x2FA4:
             insn.itype = self.itype_ifret_cond1

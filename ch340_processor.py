@@ -487,7 +487,6 @@ class ch340_processor_t(idaapi.processor_t):
 
         itable = []
         itable.append(idef('jmp', CF_USE1))
-
         itable.append(idef('call_110', CF_USE1 | CF_CALL))
         itable.append(idef('call_111', CF_USE1 | CF_CALL))
         itable.append(idef('usbtx', CF_USE1))

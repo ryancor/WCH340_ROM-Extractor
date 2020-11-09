@@ -446,7 +446,7 @@ class ch340_processor_t(idaapi.processor_t):
         InstructionCode = get_16bit(insn.ea)
         insn.size += 1
         #        InstructionCode = insn.get_next_word()     # get_next_word() only works with 8-bit program words
-        if BITS(InstructionCode, 13, 11) == 0x01:
+        if BITS(InstructionCode, 13, 8) == 0x01:
             insn.itype = self.itype_jmp
             insn.Op1.addr = BITS(InstructionCode, 10, 0)
             insn.Op1.type = o_near
@@ -458,9 +458,9 @@ class ch340_processor_t(idaapi.processor_t):
             insn.itype = self.itype_call_111
             insn.Op1.addr = BITS(InstructionCode, 10, 0)
             insn.Op1.type = o_near
-        elif BITS(InstructionCode, 7, 0) == 0x10:
+        elif BITS(InstructionCode, 13, 8) == 0x10:
             insn.itype = self.itype_usbtx
-            insn.Op1.value = BITS(InstructionCode, 13, 8)
+            insn.Op1.value = BITS(InstructionCode, 7, 0)
             insn.Op1.type = o_imm
         elif BITS(InstructionCode, 13, 0) == 0x2FA4:
             insn.itype = self.itype_ifret_cond1

@@ -446,7 +446,11 @@ class ch340_processor_t(idaapi.processor_t):
         InstructionCode = get_16bit(insn.ea)
         insn.size += 1
         #        InstructionCode = insn.get_next_word()     # get_next_word() only works with 8-bit program words
-        if BITS(InstructionCode, 13, 8) == 0x01:
+        if BITS(InstructionCode, 13, 8) == 0x00:
+            insn.itype = self.itype_movb
+            insn.Op1.value = BITS(InstructionCode, 7, 0)
+            insn.Op1.type = o_imm
+        elif BITS(InstructionCode, 13, 8) == 0x01:
             insn.itype = self.itype_jmp
             insn.Op1.addr = BITS(InstructionCode, 10, 0)
             insn.Op1.type = o_near
@@ -488,6 +492,7 @@ class ch340_processor_t(idaapi.processor_t):
         itable.append(idef('call_110', CF_USE1 | CF_CALL))
         itable.append(idef('call_111', CF_USE1 | CF_CALL))
         itable.append(idef('usbtx', CF_USE1))
+        itable.append(idef('movb', CF_USE1))
         itable.append(idef('ifret_cond1', 0))
         itable.append(idef('ifelseret_cond2', 0))
         itable.append(idef('ret', CF_STOP))

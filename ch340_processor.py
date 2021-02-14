@@ -175,7 +175,7 @@ class ch340_processor_t(idaapi.processor_t):
         # usually 1:1, i.e. trivial translation
         # If specified, must be 256 chars long
         # (optional)
-        #   'XlatAsciiOutput': "".join([chr(x) for x in xrange(256)]),
+        #   'XlatAsciiOutput': "".join([chr(x) for x in range(256)]),
 
         # current IP (instruction pointer) symbol in assembler
         'a_curip': "$",
@@ -371,7 +371,7 @@ class ch340_processor_t(idaapi.processor_t):
         if ctx.insn.Op1.type != o_void:
             msg("out_one_operand(0)\n")
             ctx.out_one_operand(0)
-        for i in xrange(1, 4):
+        for i in range(1, 4):
             if ctx.insn[i].type == o_void:
                 break
             ctx.out_symbol(',')
@@ -566,7 +566,7 @@ class ch340_processor_t(idaapi.processor_t):
         ]
 
         # Create the ireg_XXXX constants
-        for i in xrange(len(self.reg_names)):
+        for i in range(len(self.reg_names)):
             setattr(self, 'ireg_' + self.reg_names[i], i)
 
         # Segment register information (use virtual CS and DS registers if your
